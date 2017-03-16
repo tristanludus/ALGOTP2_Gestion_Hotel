@@ -1,0 +1,112 @@
+Create table T_CHAMBRE (CHB_ID integer (8) not null,
+					 CHB_NUMERO smallint (6) not null,
+					 CHB_ETAGE char (3) not null,
+					 CHB_BAIN numeric (1) not null,
+					 CHB_DOUCHE numeric (1) not null,
+					 CHB_WC numeric (1) not null,
+					 CHB_COUCHAGE smallint (6) not null,
+					 CHB_POSTE_TEL char (3) not null,
+				Primary key (CHB_ID));
+
+Create table TJ_TRF_CHB (CHB_ID integer (8) not null,
+						TRF_DATE_DEBUT date,
+						TRF_CHB_PRIX numeric (8.2),
+					Foreign key (TRF_DATE_DEBUT) references T_TARIF
+					on delete no action on update cascade,
+					Foreign key (CHB_ID) references T_CHAMBRE
+					on delete no action on update cascade);
+
+Create table T_TARIF (TRF_DATE_DEBUT date,
+					TRF_TAUX_TAXES numeric (4) not null,
+					TRF_PETIT_DEJEUNE numeric (4) not null,
+				Primary key (TRF_DATE_DEBUT));
+
+Create table T_LIGNE_FACTURE (LIF_ID integer (10) not null,
+							FAC_ID integer (10) not null,
+							LIF_QTE numeric (4) not null,
+							LIF_REMISE_POURCENT numeric (3) not null,
+							LIF_REMISE_MONTANT numeric (8.2) not null,
+							LIF_MONTANT numeric (8.2) not null,
+							LIF_TAUX_TVA numeric (8.2) not null,
+						Primary key (LIF_ID)
+						Foreign key (FAC_ID) references T_FACTURE
+						on delete no action on update cascade);
+
+Create table T_FACTURE (FAC_ID integer (8) not null,
+						CLI_ID integer (8) not null,
+						PMT_CODE char (8) not null,
+						FAC_DATE date,
+						FAC_PMT_DATE date,
+					Primary key (FAC_ID)
+					Foreign key (CLI_ID) references T_CLIENT
+					on delete no action on update cascade
+					Foreign key (PMT_CODE) references T_MODE_PAIEMENT
+					on delete no action on update cascade);
+
+Create table T_MODE_PAIEMENT (PMT_CODE char (8) not null,
+							MPT_LIBELLE varchar (64) not null,
+						Primary key (PMT_CODE));
+
+Create table TJ_CHB_PLN_CLI (CHB_ID integer (8) not null,
+							PLN_JOUR date,
+							CLI_ID integer (8) not null,
+							CHB_PLN_CLI_NB_PERS smallint (3) not null,
+							CHB_PLN_CLI_RESERVE numeric(1) not null,
+							CHB_PLN_CLI_OCCUPE numeric (1) not null,
+						Foreign key (CHB_ID) references T_CHAMBRE
+						on delete no action on update cascade
+						Foreign key (PLN_JOUR) references T_PLANNING
+						on delete no action on update cascade
+						Foreign key (CLI_ID) references T_CLIENT
+						on delete no action on update cascade);
+
+Create table T_PLANNING (PLN_JOUR date,
+					Primary key (PLN_JOUR));
+
+Create table T_CLIENT (CLI_ID integer (8) not null,
+						TIT_CODE char (8) not null,
+						CLI_NOM char (32) not null,
+						CLI_PRENOM varchar (25) not null,
+						CLI_ENSEIGNE varchar (100) not null,
+					primary key (CLI_ID)
+					Foreign key (TIT_CODE) references T_TITRE
+					on delete no action on update cascade);
+
+Create table T_ADRESSE (ADR_ID integer (8) not null,
+						CLI_ID integer (8) not null,
+						ADR_LIGNE1 varchar (32) not null,
+						ADR_LIGNE2 varchar (32) not null,
+						ADR_LIGNE3 varchar (32) not null,
+						ADR_LIGNE4 varchar (32) not null,
+						ADR_CP char (5) not null,
+						ADR_VILLE char(32) not null,
+					Primary key (ADR_ID)
+					Foreign key (CLI_ID) references T_CLIENT
+					on delete no action on update cascade);
+
+Create table T_TITRE (TIT_CODE char (8) not null,
+					TIT_LIBELLE varchar (32) not null,
+				Primary key(TIT_CODE));
+
+Create table T_EMAIL (EML_ID integer (8) not null,
+					CLI_ID integer (8) not null,
+					EML_ADRESSE varchar (100) not null,
+					EML_LOCALISATION varchar (64),
+				Primary key (EML_ID)
+				Foreign key (CLI_ID) references T_CLIENT
+				on delete no action on update cascade);
+
+Create table T_TELEPHONE (TEL_ID integer (8) not null,
+						CLI_ID integer (8) not null,
+						TYP_CODE char (8) not null,
+						TEL_NUMERO char (20) not null,
+						TEL_LOCALISATION varchar (64) not null,
+					primary key (TEL_ID)
+					Foreign key (CLI_ID) references T_CLIENT
+					on delete no action on update cascade,
+					Foreign key (TYP_CODE) references T_TYPE
+					on delete no action on update cascade);
+
+Create table T_TYPE (TYP_CODE char (8) not null,
+					TYP_LIBELLE varchar (32),
+				Primary key (TYP_CODE));
